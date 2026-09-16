@@ -1,0 +1,7 @@
+paths:
+  .github/workflows/deploy.yml:
+    ignore:
+      # actionlint 내장 액션 데이터가 오래됐다. create-github-app-token v3.2.0의 action.yml은
+      # client-id(권장)를 받고 app-id를 폐기 예정("Use 'client-id' instead.")으로 둔다 — 2026-09-15 확인
+      - 'input "client-id" is not defined in action "actions/create-github-app-token@v3"'
+      - 'missing input "app-id" which is required by action "actions/create-github-app-token@v3"'

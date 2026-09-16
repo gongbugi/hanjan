@@ -1,0 +1,3027 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "hanjan API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Healthz",
+        "description": "liveness — 프로세스가 살아 있는지만. DB를 보지 않는다 (DB 장애로 앱까지 재시작되면 안 된다).",
+        "operationId": "healthz_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Readyz",
+        "description": "readiness — DB에 닿을 때만 트래픽을 받는다.",
+        "operationId": "readyz_readyz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/flavor-tags": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Flavor Tags",
+        "operationId": "flavor_tags_api_flavor_tags_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FlavorTagOut"
+                  },
+                  "type": "array",
+                  "title": "Response Flavor Tags Api Flavor Tags Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/beans": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "List Beans",
+        "operationId": "list_beans_api_beans_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_BeanOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/beans/{bean_id}": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get Bean",
+        "operationId": "get_bean_api_beans__bean_id__get",
+        "parameters": [
+          {
+            "name": "bean_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Bean Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeanStatsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/beans/{bean_id}/similar": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get Similar Beans",
+        "operationId": "get_similar_beans_api_beans__bean_id__similar_get",
+        "parameters": [
+          {
+            "name": "bean_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Bean Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "minimum": 1,
+              "default": 5,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SimilarBeanOut"
+                  },
+                  "title": "Response Get Similar Beans Api Beans  Bean Id  Similar Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/brews": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "List Brews",
+        "operationId": "list_brews_api_brews_get",
+        "parameters": [
+          {
+            "name": "bean_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bean Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_BrewOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/brews/{brew_id}": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get Brew",
+        "operationId": "get_brew_api_brews__brew_id__get",
+        "parameters": [
+          {
+            "name": "brew_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Brew Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grinders": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "List Grinders",
+        "operationId": "list_grinders_api_grinders_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GrinderOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Grinders Api Grinders Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grinders/{grinder_id}/calibration": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Get Calibration",
+        "operationId": "get_calibration_api_grinders__grinder_id__calibration_get",
+        "parameters": [
+          {
+            "name": "grinder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Grinder Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalibrationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/grinders/{grinder_id}/suggest": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Suggest Grinder Clicks",
+        "operationId": "suggest_grinder_clicks_api_grinders__grinder_id__suggest_get",
+        "parameters": [
+          {
+            "name": "grinder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Grinder Id"
+            }
+          },
+          {
+            "name": "target_d50_mm",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 3,
+              "exclusiveMinimum": 0,
+              "title": "Target D50 Mm"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClickSuggestionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/catalog": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "List Catalog",
+        "operationId": "list_catalog_api_catalog_get",
+        "parameters": [
+          {
+            "name": "include_unavailable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Unavailable"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CatalogBeanOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recommendations/latest": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Latest Recommendations",
+        "operationId": "latest_recommendations_api_recommendations_latest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RecommendationSnapshotOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Latest Recommendations Api Recommendations Latest Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "description": "프론트의 관리자 UI 표시용. 화면 숨김은 편의일 뿐, 실제 차단은 require_admin이 한다.",
+        "operationId": "me_api_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/beans/extract": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Extract Bean",
+        "description": "봉투 사진 → 원두 정보 초안. 저장하지 않는다 — 사람이 확인·수정한 뒤 POST /beans로 저장한다.",
+        "operationId": "extract_bean_api_admin_beans_extract_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_extract_bean_api_admin_beans_extract_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeanDraftOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/beans": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Bean",
+        "operationId": "create_bean_api_admin_beans_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeanIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeanOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/beans/{bean_id}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Update Bean",
+        "operationId": "update_bean_api_admin_beans__bean_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "bean_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Bean Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeanIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeanOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete Bean",
+        "operationId": "delete_bean_api_admin_beans__bean_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "bean_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Bean Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/grinders": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Grinder",
+        "operationId": "create_grinder_api_admin_grinders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrinderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrinderOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/grinders/{grinder_id}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Update Grinder",
+        "operationId": "update_grinder_api_admin_grinders__grinder_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "grinder_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Grinder Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrinderIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrinderOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/brews": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Brew",
+        "operationId": "create_brew_api_admin_brews_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/brews/{brew_id}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Update Brew",
+        "operationId": "update_brew_api_admin_brews__brew_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "brew_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Brew Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrewIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete Brew",
+        "operationId": "delete_brew_api_admin_brews__brew_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "brew_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Brew Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/brews/suggest-tags": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Suggest Brew Tags",
+        "operationId": "suggest_brew_tags_api_admin_brews_suggest_tags_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagSuggestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagSuggestOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/grind/analyze": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Analyze Grind Preview",
+        "description": "저장하지 않는 미리보기.",
+        "operationId": "analyze_grind_preview_api_admin_grind_analyze_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_analyze_grind_preview_api_admin_grind_analyze_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrindAnalysisOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/grind/measurements": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Measurement",
+        "operationId": "create_measurement_api_admin_grind_measurements_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_measurement_api_admin_grind_measurements_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrindMeasurementOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/grind/measurements/{measurement_id}": {
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete Measurement",
+        "operationId": "delete_measurement_api_admin_grind_measurements__measurement_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "measurement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Measurement Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalog/collect": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Run Collect",
+        "operationId": "run_collect_api_admin_catalog_collect_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectResultOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/recommendations/refresh": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refresh",
+        "operationId": "refresh_api_admin_recommendations_refresh_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Country"
+            }
+          },
+          {
+            "name": "processing",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Processing"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationSnapshotOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BeanDraft": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "roaster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roaster"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          },
+          "processing": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing"
+          },
+          "roast_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roast Level"
+          },
+          "bag_flavor_notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Bag Flavor Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "roaster",
+          "country",
+          "region",
+          "variety",
+          "processing",
+          "roast_level",
+          "bag_flavor_notes"
+        ],
+        "title": "BeanDraft"
+      },
+      "BeanDraftOut": {
+        "properties": {
+          "draft": {
+            "$ref": "#/components/schemas/BeanDraft"
+          },
+          "filled_fields": {
+            "type": "integer",
+            "title": "Filled Fields"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "draft",
+          "filled_fields",
+          "provider",
+          "model"
+        ],
+        "title": "BeanDraftOut"
+      },
+      "BeanIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "roaster": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roaster"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          },
+          "processing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing"
+          },
+          "roast_level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roast Level"
+          },
+          "bag_flavor_notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Bag Flavor Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "BeanIn"
+      },
+      "BeanOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "roaster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roaster"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "variety": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variety"
+          },
+          "processing": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing"
+          },
+          "roast_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roast Level"
+          },
+          "bag_flavor_notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Bag Flavor Notes"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "roaster",
+          "country",
+          "region",
+          "variety",
+          "processing",
+          "roast_level",
+          "bag_flavor_notes",
+          "created_at"
+        ],
+        "title": "BeanOut"
+      },
+      "BeanStatsOut": {
+        "properties": {
+          "bean": {
+            "$ref": "#/components/schemas/BeanOut"
+          },
+          "brew_count": {
+            "type": "integer",
+            "title": "Brew Count"
+          },
+          "avg_rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Rating"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bean",
+          "brew_count",
+          "avg_rating"
+        ],
+        "title": "BeanStatsOut"
+      },
+      "BeanSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "roaster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roaster"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "roaster"
+        ],
+        "title": "BeanSummary"
+      },
+      "Body_analyze_grind_preview_api_admin_grind_analyze_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "marker_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Mm"
+          },
+          "mm_per_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mm Per Px"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_analyze_grind_preview_api_admin_grind_analyze_post"
+      },
+      "Body_create_measurement_api_admin_grind_measurements_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "brew_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brew Id"
+          },
+          "grinder_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grinder Id"
+          },
+          "clicks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clicks"
+          },
+          "marker_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Mm"
+          },
+          "mm_per_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mm Per Px"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_create_measurement_api_admin_grind_measurements_post"
+      },
+      "Body_extract_bean_api_admin_beans_extract_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_extract_bean_api_admin_beans_extract_post"
+      },
+      "BrewIn": {
+        "properties": {
+          "bean_id": {
+            "type": "integer",
+            "title": "Bean Id"
+          },
+          "grinder_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grinder Id"
+          },
+          "brewed_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brewed On"
+          },
+          "grind_clicks": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 300.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grind Clicks"
+          },
+          "water_temp_c": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 60.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Water Temp C"
+          },
+          "dose_g": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dose G"
+          },
+          "water_g": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 3000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Water G"
+          },
+          "brew_time_s": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3600.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brew Time S"
+          },
+          "rating": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Rating"
+          },
+          "flavor_tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Flavor Tags"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bean_id",
+          "rating"
+        ],
+        "title": "BrewIn"
+      },
+      "BrewOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "bean": {
+            "$ref": "#/components/schemas/BeanSummary"
+          },
+          "grinder_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grinder Id"
+          },
+          "brewed_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Brewed On"
+          },
+          "grind_clicks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grind Clicks"
+          },
+          "water_temp_c": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Water Temp C"
+          },
+          "dose_g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dose G"
+          },
+          "water_g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Water G"
+          },
+          "brew_time_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brew Time S"
+          },
+          "rating": {
+            "type": "integer",
+            "title": "Rating"
+          },
+          "flavor_tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Flavor Tags"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "measurements": {
+            "items": {
+              "$ref": "#/components/schemas/GrindMeasurementOut"
+            },
+            "type": "array",
+            "title": "Measurements"
+          },
+          "ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratio",
+            "description": "원두 1g당 물 g.",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "bean",
+          "grinder_id",
+          "brewed_on",
+          "grind_clicks",
+          "water_temp_c",
+          "dose_g",
+          "water_g",
+          "brew_time_s",
+          "rating",
+          "flavor_tags",
+          "note",
+          "created_at",
+          "measurements",
+          "ratio"
+        ],
+        "title": "BrewOut"
+      },
+      "CalibrationOut": {
+        "properties": {
+          "grinder_id": {
+            "type": "integer",
+            "title": "Grinder Id"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CalibrationRowOut"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "monotonic": {
+            "type": "boolean",
+            "title": "Monotonic"
+          }
+        },
+        "type": "object",
+        "required": [
+          "grinder_id",
+          "rows",
+          "monotonic"
+        ],
+        "title": "CalibrationOut"
+      },
+      "CalibrationRowOut": {
+        "properties": {
+          "clicks": {
+            "type": "integer",
+            "title": "Clicks"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "d50_median_mm": {
+            "type": "number",
+            "title": "D50 Median Mm"
+          },
+          "d50_min_mm": {
+            "type": "number",
+            "title": "D50 Min Mm"
+          },
+          "d50_max_mm": {
+            "type": "number",
+            "title": "D50 Max Mm"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clicks",
+          "n",
+          "d50_median_mm",
+          "d50_min_mm",
+          "d50_max_mm"
+        ],
+        "title": "CalibrationRowOut"
+      },
+      "CatalogBeanOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "source_name": {
+            "type": "string",
+            "title": "Source Name"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "processing": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processing"
+          },
+          "normalized": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Normalized"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source_name",
+          "source_url",
+          "title",
+          "price",
+          "available",
+          "status",
+          "country",
+          "processing",
+          "normalized",
+          "first_seen_at",
+          "last_seen_at"
+        ],
+        "title": "CatalogBeanOut"
+      },
+      "ClickSuggestionOut": {
+        "properties": {
+          "grinder_id": {
+            "type": "integer",
+            "title": "Grinder Id"
+          },
+          "target_d50_mm": {
+            "type": "number",
+            "title": "Target D50 Mm"
+          },
+          "clicks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clicks"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "grinder_id",
+          "target_d50_mm",
+          "clicks",
+          "reason"
+        ],
+        "title": "ClickSuggestionOut"
+      },
+      "CollectResultOut": {
+        "properties": {
+          "fetched": {
+            "type": "integer",
+            "title": "Fetched"
+          },
+          "new": {
+            "type": "integer",
+            "title": "New"
+          },
+          "updated": {
+            "type": "integer",
+            "title": "Updated"
+          },
+          "normalized": {
+            "type": "integer",
+            "title": "Normalized"
+          },
+          "skipped": {
+            "type": "integer",
+            "title": "Skipped"
+          },
+          "failed": {
+            "type": "integer",
+            "title": "Failed"
+          },
+          "pending": {
+            "type": "integer",
+            "title": "Pending"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fetched",
+          "new",
+          "updated",
+          "normalized",
+          "skipped",
+          "failed",
+          "pending",
+          "errors"
+        ],
+        "title": "CollectResultOut"
+      },
+      "FlavorTagOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "group": {
+            "type": "string",
+            "title": "Group"
+          },
+          "group_label": {
+            "type": "string",
+            "title": "Group Label"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "group",
+          "group_label",
+          "label"
+        ],
+        "title": "FlavorTagOut"
+      },
+      "GrindAnalysisOut": {
+        "properties": {
+          "particle_count": {
+            "type": "integer",
+            "title": "Particle Count"
+          },
+          "mm_per_px": {
+            "type": "number",
+            "title": "Mm Per Px"
+          },
+          "d10_mm": {
+            "type": "number",
+            "title": "D10 Mm"
+          },
+          "d50_mm": {
+            "type": "number",
+            "title": "D50 Mm"
+          },
+          "d90_mm": {
+            "type": "number",
+            "title": "D90 Mm"
+          },
+          "count_d50_mm": {
+            "type": "number",
+            "title": "Count D50 Mm"
+          },
+          "min_detectable_mm": {
+            "type": "number",
+            "title": "Min Detectable Mm"
+          },
+          "clump_suspects": {
+            "type": "integer",
+            "title": "Clump Suspects"
+          },
+          "histogram": {
+            "items": {
+              "$ref": "#/components/schemas/HistogramBinOut"
+            },
+            "type": "array",
+            "title": "Histogram"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "count_d10_mm": {
+            "type": "number",
+            "title": "Count D10 Mm"
+          },
+          "count_d90_mm": {
+            "type": "number",
+            "title": "Count D90 Mm"
+          }
+        },
+        "type": "object",
+        "required": [
+          "particle_count",
+          "mm_per_px",
+          "d10_mm",
+          "d50_mm",
+          "d90_mm",
+          "count_d50_mm",
+          "min_detectable_mm",
+          "clump_suspects",
+          "histogram",
+          "warnings",
+          "count_d10_mm",
+          "count_d90_mm"
+        ],
+        "title": "GrindAnalysisOut"
+      },
+      "GrindMeasurementOut": {
+        "properties": {
+          "particle_count": {
+            "type": "integer",
+            "title": "Particle Count"
+          },
+          "mm_per_px": {
+            "type": "number",
+            "title": "Mm Per Px"
+          },
+          "d10_mm": {
+            "type": "number",
+            "title": "D10 Mm"
+          },
+          "d50_mm": {
+            "type": "number",
+            "title": "D50 Mm"
+          },
+          "d90_mm": {
+            "type": "number",
+            "title": "D90 Mm"
+          },
+          "count_d50_mm": {
+            "type": "number",
+            "title": "Count D50 Mm"
+          },
+          "min_detectable_mm": {
+            "type": "number",
+            "title": "Min Detectable Mm"
+          },
+          "clump_suspects": {
+            "type": "integer",
+            "title": "Clump Suspects"
+          },
+          "histogram": {
+            "items": {
+              "$ref": "#/components/schemas/HistogramBinOut"
+            },
+            "type": "array",
+            "title": "Histogram"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "brew_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brew Id"
+          },
+          "grinder_id": {
+            "type": "integer",
+            "title": "Grinder Id"
+          },
+          "clicks": {
+            "type": "integer",
+            "title": "Clicks"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "particle_count",
+          "mm_per_px",
+          "d10_mm",
+          "d50_mm",
+          "d90_mm",
+          "count_d50_mm",
+          "min_detectable_mm",
+          "clump_suspects",
+          "histogram",
+          "warnings",
+          "id",
+          "brew_id",
+          "grinder_id",
+          "clicks",
+          "created_at"
+        ],
+        "title": "GrindMeasurementOut"
+      },
+      "GrinderIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "GrinderIn"
+      },
+      "GrinderOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "notes",
+          "created_at"
+        ],
+        "title": "GrinderOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistogramBinOut": {
+        "properties": {
+          "lo_mm": {
+            "type": "number",
+            "title": "Lo Mm"
+          },
+          "hi_mm": {
+            "type": "number",
+            "title": "Hi Mm"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "area_share": {
+            "type": "number",
+            "title": "Area Share"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lo_mm",
+          "hi_mm",
+          "count",
+          "area_share"
+        ],
+        "title": "HistogramBinOut"
+      },
+      "MeOut": {
+        "properties": {
+          "uid": {
+            "type": "string",
+            "title": "Uid"
+          },
+          "is_admin": {
+            "type": "boolean",
+            "title": "Is Admin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "uid",
+          "is_admin"
+        ],
+        "title": "MeOut"
+      },
+      "Page_BeanOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BeanOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[BeanOut]"
+      },
+      "Page_BrewOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BrewOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[BrewOut]"
+      },
+      "Page_CatalogBeanOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogBeanOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "Page[CatalogBeanOut]"
+      },
+      "RecommendationItemOut": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "my_bean",
+              "catalog"
+            ],
+            "title": "Kind"
+          },
+          "ref_id": {
+            "type": "integer",
+            "title": "Ref Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "similarity": {
+            "type": "number",
+            "title": "Similarity"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "reason_source": {
+            "type": "string",
+            "enum": [
+              "llm",
+              "template"
+            ],
+            "title": "Reason Source"
+          },
+          "evidence_brew_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Evidence Brew Ids"
+          },
+          "start_grind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StartGrindOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "ref_id",
+          "title",
+          "similarity",
+          "reason",
+          "reason_source",
+          "evidence_brew_ids",
+          "start_grind"
+        ],
+        "title": "RecommendationItemOut"
+      },
+      "RecommendationSnapshotOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "embedding_model": {
+            "type": "string",
+            "title": "Embedding Model"
+          },
+          "llm_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llm Model"
+          },
+          "profile_brew_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Profile Brew Ids"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendationItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "embedding_model",
+          "llm_model",
+          "profile_brew_ids",
+          "items"
+        ],
+        "title": "RecommendationSnapshotOut"
+      },
+      "SimilarBeanOut": {
+        "properties": {
+          "bean": {
+            "$ref": "#/components/schemas/BeanOut"
+          },
+          "similarity": {
+            "type": "number",
+            "title": "Similarity"
+          },
+          "brew_count": {
+            "type": "integer",
+            "title": "Brew Count"
+          },
+          "avg_rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Rating"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bean",
+          "similarity",
+          "brew_count",
+          "avg_rating"
+        ],
+        "title": "SimilarBeanOut"
+      },
+      "StartGrindOut": {
+        "properties": {
+          "d50_mm": {
+            "type": "number",
+            "title": "D50 Mm"
+          },
+          "grinder_id": {
+            "type": "integer",
+            "title": "Grinder Id"
+          },
+          "clicks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clicks"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "d50_mm",
+          "grinder_id",
+          "clicks",
+          "reason"
+        ],
+        "title": "StartGrindOut"
+      },
+      "TagSuggestIn": {
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "note"
+        ],
+        "title": "TagSuggestIn"
+      },
+      "TagSuggestOut": {
+        "properties": {
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "dropped": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dropped"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tags",
+          "dropped",
+          "provider",
+          "model"
+        ],
+        "title": "TagSuggestOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

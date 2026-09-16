@@ -1,0 +1,105 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  backend-image:
+    # VM이 ARM(Ampere A1)이라 arm64 러너에서 네이티브로 빌드한다.
+    # QEMU 에뮬레이션으로 amd64 러너에서 빌드하면 torch 설치가 매우 느리다.
+    # (arm64 표준 러너는 2026-01부터 private 레포에서도 무료 분 안에서 쓸 수 있다)
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - id: meta
+        run: echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: backend
+          platforms: linux/arm64
+          push: true
+          # latest 태그를 쓰지 않는다 — 커밋 SHA 태그라야 배포 레포에서 한 줄로 롤백할 수 있다
+          tags: ghcr.io/${{ github.repository_owner }}/hanjan-backend:${{ steps.meta.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  bump-deploy-repo:
+    needs: backend-image
+    runs-on: ubuntu-24.04
+    steps:
+      # 자기 레포용 GITHUB_TOKEN은 다른 레포에 쓸 수 없다 → GitHub App 단명 토큰 (PAT·배포 키보다 수명이 짧다)
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.DEPLOY_APP_CLIENT_ID }}
+          private-key: ${{ secrets.DEPLOY_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: hanjan-deploy
+          permission-contents: write
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ github.repository_owner }}/hanjan-deploy
+          token: ${{ steps.app-token.outputs.token }}
+      - name: 이미지 태그 갱신
+        env:
+          TAG: ${{ needs.backend-image.outputs.tag }}
+        run: |
+          sed -i -E "s/^(\s*newTag:\s*)\S+/\1${TAG}/" overlays/prod/kustomization.yaml
+          git diff --stat
+          git config user.name "hanjan-deploy-bot"
+          git config user.email "hanjan-deploy-bot@users.noreply.github.com"
+          git commit -am "deploy: hanjan-backend ${TAG}"
+          git push
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
+      VITE_AUTH_MODE: firebase
+      # Firebase 웹 설정은 공개돼도 되는 값이다 — 권한은 서버의 관리자 허용 목록이 정한다
+      VITE_FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: frontend
+          command: pages deploy dist --project-name=hanjan --branch=main

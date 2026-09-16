@@ -1,0 +1,19 @@
+# 로컬 개발용 DB. 백엔드는 venv에서 `uvicorn hanjan.main:create_app --factory --reload`로 띄운다 (README 참고)
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: hanjan
+      POSTGRES_PASSWORD: hanjan
+      POSTGRES_DB: hanjan
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hanjan -d hanjan"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata: {}

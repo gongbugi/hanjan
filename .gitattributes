@@ -1,0 +1,6 @@
+# Windows에서 작업해도 저장소에는 LF로 — 생성 파일(openapi.json, schema.d.ts)의 CI diff 검사가 줄바꿈 때문에 깨지지 않게
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary

@@ -1,0 +1,17 @@
+# 신상 원두 수집 대상. 운영에서는 hanjan-deploy의 ConfigMap으로 넣는다.
+# 넣기 전에 각 사이트 이용약관을 사람이 확인한다. robots.txt와 요청 간격은 코드가 지킨다.
+sources:
+  - name: 예시 로스터리 (Shopify)
+    kind: shopify           # {url}/products.json 을 읽는다
+    url: https://example-roastery.com
+    enabled: false
+
+  - name: 예시 로스터리 (HTML 목록)
+    kind: html
+    url: https://example.com/shop/beans
+    enabled: false
+    item_selector: ".product-item"
+    title_selector: ".product-name"
+    link_selector: "a"
+    text_selector: ".product-desc"
+    price_selector: ".price"

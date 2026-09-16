@@ -1,0 +1,84 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.6-pg17
+        env:
+          POSTGRES_USER: hanjan
+          POSTGRES_PASSWORD: hanjan
+          POSTGRES_DB: hanjan_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hanjan"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      HANJAN_TEST_DATABASE_URL: postgresql+psycopg://hanjan:hanjan@localhost:5432/hanjan_test
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      # 라우트 전수 보호 검사 · 마이그레이션-모델 일치(alembic check) 포함
+      - run: pytest
+      - name: OpenAPI 명세가 커밋본과 같은지 (프론트 타입 어긋남 방지)
+        run: |
+          python scripts/export_openapi.py /tmp/openapi.json
+          diff -u openapi.json /tmp/openapi.json
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: 생성 타입이 OpenAPI 명세와 같은지
+        run: npm run gen:api && git diff --exit-code src/api/schema.d.ts
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  infra:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: infra/terraform/oci
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@v4
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -input=false
+      - run: terraform validate

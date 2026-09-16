@@ -1,0 +1,14 @@
+[
+  {
+    "image": "images/001.jpg",
+    "expected": {
+      "name": "예가체프 코체레",
+      "roaster": "예시 로스터리",
+      "country": "Ethiopia",
+      "region": "Yirgacheffe",
+      "variety": null,
+      "processing": "Washed",
+      "roast_level": "Light"
+    }
+  }
+]

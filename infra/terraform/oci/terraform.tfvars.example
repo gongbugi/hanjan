@@ -1,0 +1,15 @@
+# cp terraform.tfvars.example terraform.tfvars  (terraform.tfvars는 커밋하지 않는다)
+tenancy_ocid     = "ocid1.tenancy.oc1..xxxx"
+user_ocid        = "ocid1.user.oc1..xxxx"
+fingerprint      = "aa:bb:cc:..."
+private_key_path = "~/.oci/oci_api_key.pem"
+compartment_ocid = "ocid1.compartment.oc1..xxxx"
+
+region                    = "ap-seoul-1" # 춘천(ap-chuncheon-1)은 검증에서 막힌다
+availability_domain_index = 0
+
+ssh_public_key = "ssh-ed25519 AAAA... me@laptop"
+admin_cidr     = "203.0.113.7/32"
+
+ingress_mode       = "public_https" # 도메인을 사지 않기로 했다 — 무료 DDNS 호스트명 + Let's Encrypt
+budget_alert_email = "me@example.com"

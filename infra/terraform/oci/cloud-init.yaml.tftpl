@@ -1,0 +1,47 @@
+#cloud-config
+package_update: true
+packages:
+  - curl
+  - ca-certificates
+  - git
+  - iptables-persistent
+
+write_files:
+  - path: /etc/rancher/k3s/config.yaml
+    permissions: "0600"
+    content: |
+      write-kubeconfig-mode: "0600"
+      # tunnel 모드는 Cloudflare Tunnel이 들어오는 길이라 Traefik·ServiceLB가 필요 없다
+      disable: ${jsonencode(ingress_mode == "tunnel" ? ["traefik", "servicelb"] : [])}
+  - path: /etc/hanjan/sync.env
+    permissions: "0600"
+    content: |
+      # 동기화 스크립트가 읽는 값. 여기에 age 개인키를 넣지 않는다 (키는 /etc/hanjan/age.key).
+      REPO_URL=${deploy_repo_url}
+      # public_https 모드면 sync가 cert-manager를 먼저 깐다 (ClusterIssuer가 CRD를 요구한다)
+      INGRESS_MODE=${ingress_mode}
+      CERT_MANAGER_VERSION=${cert_manager_version}
+      # 외부 확인 서비스를 고르면 핑 주소를 넣는다. 비어 있으면 핑을 보내지 않는다
+      PING_URL=
+
+runcmd:
+  # OCI 우분투 이미지는 iptables INPUT 끝에 REJECT 규칙을 넣어 둔다 — 보안 목록만 열어서는 포트가 안 열린다.
+  # k3s 파드 대역(10.42.0.0/16)·cni0도 그 규칙에 걸리면 CoreDNS가 뜨지 않는다는 보고가 많아 미리 연다.
+  # (부팅 뒤 `kubectl -n kube-system get pods`로 CoreDNS가 Running인지 반드시 확인)
+  - [iptables, -I, INPUT, "1", -s, 10.42.0.0/16, -j, ACCEPT]
+  - [iptables, -I, INPUT, "1", -i, cni0, -j, ACCEPT]
+  - ${ingress_mode == "public_https" ? "iptables -I INPUT 1 -p tcp -m multiport --dports 80,443 -m state --state NEW -j ACCEPT" : "true"}
+  - [netfilter-persistent, save]
+  - sh -c 'curl -sfL https://get.k3s.io | INSTALL_K3S_CHANNEL=stable sh -'
+  - sh -c 'until k3s kubectl get nodes 2>/dev/null | grep -q " Ready"; do sleep 5; done'
+
+  # --- 시크릿 복호화 도구 (ArgoCD 대신 노드가 직접 푼다) ---
+  - sh -c 'curl -sfLo /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v${sops_version}/sops-v${sops_version}.linux.arm64 && chmod 0755 /usr/local/bin/sops'
+  - sh -c 'curl -sfL https://github.com/FiloSottile/age/releases/download/v${age_version}/age-v${age_version}-linux-arm64.tar.gz | tar -xz -C /tmp && install -m 0755 /tmp/age/age /tmp/age/age-keygen /usr/local/bin/'
+
+  # --- 배포 레포를 당겨 적용하는 타이머 (ArgoCD 대체) ---
+  # age 개인키(/etc/hanjan/age.key)는 사람이 넣는다. 그 전까지 sync는 시크릿 단계에서 실패한다 —
+  # 조용히 지나가지 않게 일부러 실패시킨다.
+  - [mkdir, -p, /var/lib/hanjan]
+  - sh -c 'git clone --depth 1 ${deploy_repo_url} /var/lib/hanjan/deploy'
+  - sh -c '/var/lib/hanjan/deploy/sync/install.sh'

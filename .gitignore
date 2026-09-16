@@ -1,0 +1,27 @@
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+backend/.env
+
+# node
+node_modules/
+frontend/dist/
+frontend/.env.local
+
+# terraform (.terraform.lock.hcl 은 커밋한다)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+backend.hcl
+crash.log
+
+# 평가 데이터 — 봉투 사진에는 송장(이름·주소)이 섞일 수 있어 레포에 올리지 않는다
+backend/eval/bean_extract/images/
+backend/eval/bean_extract/labels.json
+backend/eval/**/reports/

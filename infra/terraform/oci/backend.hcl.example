@@ -1,0 +1,13 @@
+# cp backend.hcl.example backend.hcl  (backend.hcl은 커밋하지 않는다)
+# 상태 버킷은 콘솔에서 먼저 만든다 — 상태를 담을 버킷을 같은 Terraform으로 만들 수는 없다 (닭과 달걀)
+# 자격증명은 파일에 적지 않고 환경변수로: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (OCI Customer Secret Key)
+bucket                      = "hanjan-tfstate"
+key                         = "oci/terraform.tfstate"
+region                      = "ap-seoul-1"
+endpoints                   = { s3 = "https://<namespace>.compat.objectstorage.ap-seoul-1.oraclecloud.com" }
+skip_region_validation      = true
+skip_credentials_validation = true
+skip_requesting_account_id  = true
+skip_metadata_api_check     = true
+skip_s3_checksum            = true
+use_path_style              = true
