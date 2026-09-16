@@ -144,6 +144,9 @@ cd frontend && npm test
 
 ## 배포
 
+⚠️ **배포 워크플로는 꺼져 있다.** 계정·시크릿(GitHub App · Cloudflare · Firebase)이 준비되면 켠다:
+`gh variable set DEPLOY_ENABLED --body true`. 그 전에는 `ci`만 돈다.
+
 - 인프라: [infra/terraform/oci](infra/terraform/oci/README.md)
 - 매니페스트·부트스트랩·복원: [hanjan-deploy](https://github.com/gongbugi/hanjan-deploy)
 - 평가: [backend/eval](backend/eval/README.md)
