@@ -39,6 +39,9 @@ include = ["hanjan*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# 테스트가 tests.conftest·eval.* 를 import한다. 편집 설치(pip install -e .)는 hanjan* 패키지만 노출하므로
+# 로컬에서는 우연히 되고 CI에서는 ModuleNotFoundError가 났다 → 레포 루트를 명시적으로 얹는다
+pythonpath = ["."]
 addopts = "-m 'not slow'"
 markers = [
   "db: Postgres + pgvector가 필요하다 (HANJAN_TEST_DATABASE_URL)",
